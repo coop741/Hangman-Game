@@ -11,8 +11,12 @@
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
 </head>
@@ -21,20 +25,77 @@
 	<div class="row">
 		<!-- First (and only column) -->
 		<div class="col-md-12">
-			
+			<div id="guesses">Guesses</div>
 		</div>
 	</div>
 
 
 
-	<div class="container">
-		<!-- Second Row -->
-		<div class="row">
-			<div class="col-xs-12 col-sm-12 col-md-8">
-				
-			</div>
-			
-		</div>
-	</div>
-</body>
-</html>
+	<script type="text/javascript">
+		// Here we are provided an initial array of letters.
+		// Use this array to dynamically create buttons on the screen.
+		var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_"];
+		var wordsList = ["happy"];
+
+		// Breaks chosen word into char array
+		var lettersInChosenWord = [];
+		// If letter exists, toggle to true
+		var letterInWord = false
+		// This will be the number of blanks we show based on the solution
+		var numBlanks = 0;
+		// Holds a mix of blank and solved letters (ex: 'n, _ _, n, _').
+		var blanksAndSuccesses = [];
+		// Holds all of the wrong guesses
+		var wrongGuesses = [];
+		// Game counters
+		var winCounter = 0;
+		var lossCounter = 0;
+		var numGuesses = 9;
+		// chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+		chosenWord = wordsList[0];
+		
+		// when a letter is found, store indices where it occurs
+		var letterOccurs = [];
+
+		// loop through chosen word, look for letter to match
+		// C A R -> C found, rewrite lettersInChosenWord as A R, 
+
+		for(var i = 0; i < chosenWord.length; i++) {
+			lettersInChosenWord[i] = chosenWord.charAt(i);
+			letterOccurs[i] = "_";
+		}
+
+		document.onkeyup = function(event) {
+			// store user key
+			var letter = event.key;
+
+			for(var i = 0; i < chosenWord.length; i++) {
+				if(lettersInChosenWord[i] === letter) {
+				    // If the letter exists then toggle this boolean to true. This will be used in the next step.
+				    letterInWord = true;
+				    letterOccurs[i] = letter;
+				}
+			}
+			if(letterInWord) {
+				// re-write screen output
+
+				// replace page text with guess
+				document.querySelector("#guesses").innerHTML = letterOccurs.join("");
+
+			}
+			console.log(letterOccurs);
+		};
+
+		// Reset Game after win 
+
+
+
+		// *** Use <p> or span elements to apply style to individual characters
+
+
+
+
+		</script>
+
+	</body>
+	</html>
