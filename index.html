@@ -25,17 +25,53 @@
 	<div class="row">
 		<!-- First (and only column) -->
 		<div class="col-md-12">
-			<div id="guesses">Guesses</div>
+			<span id="guesses">What state am I?</span>
 		</div>
 	</div>
 
+	<br>
 
+	<div class="row">
+		<!-- First (and only column) -->
+		<div class="col-md-12">
+			<h3 id="numGuesses">Number of Guesses Left: 9</h3>
+		</div>
+	</div>
+
+	<br>
+
+	<div class="row">
+		<!-- First (and only column) -->
+		<div class="col-md-12">
+			<p id="gamesWon">Number of Games Won: 0</p>
+		</div>
+	</div>
+
+	<br>
+
+	<div class="row">
+		<!-- First (and only column) -->
+		<div class="col-md-12">
+			<p id="gamesLost">Number of Games Lost: 0</p>
+		</div>
+	</div>
+
+	<style>
+		span {
+			font-size: 24px;
+			letter-spacing: 5px;
+		}
+		
+		p {
+			font-size: 18px;
+		}
+	</style>
 
 	<script type="text/javascript">
 		// Here we are provided an initial array of letters.
 		// Use this array to dynamically create buttons on the screen.
 		var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_"];
-		var wordsList = ["happy"];
+		var wordsList = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
 		// Breaks chosen word into char array
 		var lettersInChosenWord = [];
@@ -51,8 +87,9 @@
 		var winCounter = 0;
 		var lossCounter = 0;
 		var numGuesses = 9;
-		// chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
-		chosenWord = wordsList[0];
+		chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+		var unlocked = true;
+
 		
 		// when a letter is found, store indices where it occurs
 		var letterOccurs = [];
@@ -68,22 +105,99 @@
 		document.onkeyup = function(event) {
 			// store user key
 			var letter = event.key;
+			console.log(letter);
+			console.log("Before reset: " + chosenWord);
+			// console.log("Before reset: letterOccurs: " + letterOccurs);
+			// console.log("Before reset: chosenWord:" + chosenWord);
+
+			// start a new round
+			if(letter === "Enter") {
+				console.log("Inside Enter")
+				// for(var i = chosenWord.length - 1; i >= 0; i--) {
+				// 	lettersInChosenWord[i] = '';
+				// 	letterOccurs[i] = '';
+				// 	console.log(lettersInChosenWord);
+				// }
+				numGuesses = 10;
+				unlocked = true;
+				letterOccurs = [];
+				lettersInChosenWord = [];
+				chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+				console.log("After reset: " + chosenWord);
+				
+				for(var i = 0; i < chosenWord.length; i++) {
+					lettersInChosenWord[i] = chosenWord.charAt(i);
+					if(chosenWord.charAt(i) == " ") {
+						// spacing out two words
+						letterOccurs[i] = " ";
+					}
+					// underscore characters to be printed out
+					else {
+						letterOccurs[i] = "_";
+					}
+				}
+
+				document.querySelector("#guesses").innerHTML = letterOccurs.join("");
+			}
 
 			for(var i = 0; i < chosenWord.length; i++) {
-				if(lettersInChosenWord[i] === letter) {
+				if(lettersInChosenWord[i].toLowerCase() === letter) {
 				    // If the letter exists then toggle this boolean to true. This will be used in the next step.
 				    letterInWord = true;
-				    letterOccurs[i] = letter;
+
+				    // Capitalizes first letter of state name
+				    if(i == 0) {
+				    	letterOccurs[0] = letter.toUpperCase();
+				    }
+				    // else if statements capitalize the second part of the state name
+				    else if(i == 4 && (chosenWord == "New Hampshire" || chosenWord == "New Jersey" || chosenWord == "New Mexico" || chosenWord == "New York")) {
+				    	letterOccurs[4] = letter.toUpperCase();
+				    }
+				    else if(i == 6 && (chosenWord == "North Carolina" || chosenWord == "North Dakota" || chosenWord == "Rhode Island" || chosenWord =="South Carolina" || chosenWord == "South Dakota")) {
+				    	letterOccurs[6] = letter.toUpperCase();
+				    }
+				    else if(i == 5 && chosenWord == "West Virginia") {
+				    	letterOccurs[5] = letter.toUpperCase();
+				    }
+				    else {
+				    	letterOccurs[i] = letter;
+				    }
 				}
 			}
-			if(letterInWord) {
+
+			// correct guess, print letter onto page
+			if(letterInWord && unlocked) {
 				// re-write screen output
 
 				// replace page text with guess
 				document.querySelector("#guesses").innerHTML = letterOccurs.join("");
 
+				letterInWord = false;
+
+				// User won the game
+				if(letterOccurs.join("") == chosenWord) {
+					unlocked = false;
+					winCounter++;
+					document.querySelector("#numGuesses").innerHTML = "You Won! Press Enter to Play Again!";
+					document.querySelector("#gamesWon").innerHTML = "Number of Games Won: " + winCounter;
+				}
+
 			}
-			console.log(letterOccurs);
+			else {
+				if(numGuesses > 0) {
+					numGuesses--;
+					document.querySelector("#numGuesses").innerHTML = "Number of Guesses Left: " + numGuesses;
+				}
+				if(numGuesses == 0 && unlocked) {
+					unlocked = false;
+					lossCounter++;
+					document.querySelector("#numGuesses").innerHTML = "Press Enter to Try Again";
+					document.querySelector("#gamesLost").innerHTML = "Number of Games Lost: " + lossCounter;
+				}
+			}
+			console.log("letterOccurs: " + letterOccurs);
+			console.log("lettersInChosenWord: " + lettersInChosenWord);
+
 		};
 
 		// Reset Game after win 
